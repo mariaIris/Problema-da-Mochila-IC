@@ -5,6 +5,7 @@
  */
 package projetoic;
 
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -15,29 +16,29 @@ import java.util.Random;
 public class Individuo implements Comparable<Individuo>{
     
     private final Random random = new Random();
-    private int aptidao;
+    private Double aptidao;
 
     //atributos do problema especifico
-    private int[] NumPeso;
-    private int[] NumPreco;
-    private final int qtd = 8;
-       //cria um individuo aleatorio da primeira geracao
+    private final static double[] NumPeso = {5, 4, 7, 8, 4, 4, 6, 8};
+    private final static double[] NumPreco = {3, 3, 2, 4, 2, 3, 5, 8};
+    private static int[] cromossomo;
+    private int qtd = 8;
+    
 
+    //cria um individuo aleatorio da primeira geracao
     public Individuo() {
         
         do{
-            this.setNumPreco();
-            this.setNumPeso();
+          cromossomo = new int[8];
+          this.setCromossomo();
             
         }while(!validar());
         avaliar();
     }
         
-    public Individuo(int[] genes) {
-      for (int i = 0; i < qtd; i++) {
-           NumPeso[i] = genes[0];
-	   NumPreco[i] = genes[1];
-      }
+    public Individuo(int[] genes) { 
+	   cromossomo = genes;
+      
 	    //testa se deve fazer mutacao
 	    if (random.nextInt() <= Genetico.TAXADEMUTACAO) {
 		int posAleatoria = random.nextInt(genes.length); //define gene que sera mutado
@@ -46,55 +47,66 @@ public class Individuo implements Comparable<Individuo>{
 		avaliar();
 	}
 
+    public void setCromossomo() {
+       boolean x = random.nextBoolean();
      
-    public void setNumPreco() {
-        for (int i = 0; i < qtd; i++) {
-             this.NumPreco[i] = random.nextInt();
+       for (int i = 0; i < qtd; i++) {
+            if(x == true){
+               cromossomo[i] = 1;
+            }else{
+               cromossomo[i] = 0;
+            }
         }
-    }
-    public void setNumPeso() {       
-        for (int i = 0; i < qtd; i++) {
-             this.NumPeso[i] = random.nextInt();
-        }        
-    }
-    
-    public int getAptidao() {
-	return aptidao;
-    }
-    
+    }   
+  
     private boolean validar() {
-        //validar/
         int TotalPeso = 0;
-        for (int i = 0; i < qtd; i++) {
-             TotalPeso += NumPeso[i];
-          }
         
+        for (int i = 0; i < qtd; i++) {
+            if(cromossomo[i] == 1){
+              TotalPeso += NumPeso[i];
+            }
+        }
         return TotalPeso <=25;
     }
 
     private void avaliar() {
-        //aptidao = 0.8 * qtdMilho + 3.8 * qtdSoja;
+        aptidao = 0.0;
         //A avaliação vai a maximação do Preco dos Objetos da Bolsa;
         for (int i = 0; i < qtd; i++) {
-             aptidao += NumPreco[i]; 
+            if(cromossomo[i] == 1){
+               aptidao += NumPreco[i]; 
+            }
         }
     }
     
     private void mutacao(int posicao) {
 	do {
-	    if (posicao == 0)
-		this.setNumPeso();
-	    else if (posicao == 1)
-		this.setNumPreco();
+	  if(cromossomo[posicao] == 0){
+             cromossomo[posicao] = 1;
+          }else{
+             cromossomo[posicao] = 0;
+          }
 	} while (!validar());
 
     }
 
-   
+    public Double getAptidao() {
+        return aptidao;
+    }
+
+    public int[] getGenes() {
+        return cromossomo;          
+    }
 
     //Comparar para Ordenar --------------------/
         @Override
 	public int compareTo(Individuo i) {
 		return this.aptidao.compareTo(i.aptidao);
+	}
+        
+        @Override
+	public String toString() {
+		return "Cromossomo " + Arrays.toString(getGenes()) + " Aptidao: " + aptidao + "\n";
 	}
 }

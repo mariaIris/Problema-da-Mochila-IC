@@ -58,5 +58,4 @@ public class Populacao {
 	   return ListaIndividuos.size();
     }
     
-    
 }
